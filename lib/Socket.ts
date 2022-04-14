@@ -5,22 +5,21 @@ interface Message {
   message: string;
 }
 
-interface MessageHistory {
-  in: Message[];
-  out: Message[];
-}
+// interface MessageHistory {
+//   in: Message[];
+//   out: Message[];
+// }
 
 export class Socket<T> {
   private port: number;
   private hostname: string;
-  private socket: Deno.TcpConn | null = null;
-  private socketEvents: EventEmmiter<T> = new EventEmmiter();
-  private history: MessageHistory = {
-    in: [],
-    out: [],
-  };
+  private socketEvents: EventEmmiter = new EventEmmiter();
+  // private history: MessageHistory = {
+  //   in: [],
+  //   out: [],
+  // };
 
-  set onData(f: EventFunction<T>) {
+  set onData(f: EventFunction) {
     this.socketEvents.on("data", f);
   }
 
@@ -29,13 +28,13 @@ export class Socket<T> {
     this.port = port;
   }
 
-  async connect(): Promise<void> {
-    this.socket = await Deno.connect({ hostname: this.hostname, port: this.port, transport: "tcp" }); 
-  }
-
   async write(message: Message): Promise<void> {
-    this.history.out = [...this.history.out, message];
-    await this.socket?.write(new TextEncoder().encode(JSON.stringify(message)));
+    const connection = await Deno.connect({ hostname: this.hostname, port: this.port, transport: "tcp" });
+    await connection.write(new TextEncoder().encode(JSON.stringify(message)));
+    const buffer = new Uint8Array(1024);
+    await connection.read(buffer);
+    const response = new TextDecoder().decode(buffer);
+    this.socketEvents.emit("data", response);
   }
 }
 

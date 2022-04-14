@@ -1,4 +1,4 @@
-import { EventEmmiter, EventFn } from "./eventEmitter.ts";
+import { EventEmmiter, EventFn } from "./EventEmitter.ts";
 
 export class Server {
   private port: number;

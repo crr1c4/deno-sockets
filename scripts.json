@@ -1,13 +1,13 @@
 {
   "scripts": {
     "server": {
-      "cmd": "./server.ts",
+      "cmd": "./examples/server.ts",
       "watch": true,
       "unstable": true,
       "allow": ["all"]
     },
     "client": {
-      "cmd": "./client.ts",
+      "cmd": "./examples/client.ts",
       "watch": true,
       "unstable": true,
       "allow": ["all"]

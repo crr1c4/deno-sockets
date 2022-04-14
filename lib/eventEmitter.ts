@@ -1,27 +1,27 @@
-export type EventFunction<T> = (data: T) => void;
+export type EventFn = (data: unknown) => void;
 
-interface Event<T> {
-  [eventName: string]: EventFunction<T>[];
+interface Event {
+  [eventName: string]: EventFn[];
 }
 
-export class EventEmmiter<T> {
-  private events: Event<T>;
+export class EventEmmiter {
+  private events: Event;
 
   constructor() {
     this.events = {};
   }
 
-  on(name: string, listener: (data: T) => void): void {
+  on(name: string, listener: EventFn): void {
     if (!this.events[name]) this.events[name] = [];
     this.events[name] = [...this.events[name], listener];
   }
 
-  removeEventListener(name: string, listenerToRemove: (data: T) => void): void {
+  removeEventListener(name: string, listenerToRemove: EventFn): void {
     if (!this.events[name]) throw new Error(`Can't remove a listener, Event ${name} doesn't exists.`);
     this.events[name] = this.events[name].filter((listener) => listener !== listenerToRemove);
   }
 
-  emit(name: string, data: T) {
+  emit(name: string, data: unknown) {
     if (!this.events[name]) throw new Error(`Can't emit an event. Event ${name} doesn't exist`);
     this.events[name].forEach((callback) => callback(data));
   }

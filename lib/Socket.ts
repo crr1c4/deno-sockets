@@ -1,40 +1,27 @@
-import { EventEmmiter, EventFunction } from "./eventEmitter.ts";
+import { EventEmmiter, EventFn } from "./eventEmitter.ts";
 
-interface Message {
-  username: string;
-  message: string;
-}
-
-// interface MessageHistory {
-//   in: Message[];
-//   out: Message[];
-// }
-
-export class Socket<T> {
+export class Socket {
   private port: number;
   private hostname: string;
-  private socketEvents: EventEmmiter = new EventEmmiter();
-  // private history: MessageHistory = {
-  //   in: [],
-  //   out: [],
-  // };
+  private events: EventEmmiter = new EventEmmiter();
 
-  set onData(f: EventFunction) {
-    this.socketEvents.on("data", f);
-  }
-
-  constructor({ hostname, port }: { hostname: string; port: number }) {
+  constructor({ hostname, port }: { hostname: string, port: number }) {
     this.hostname = hostname;
     this.port = port;
   }
 
-  async write(message: Message): Promise<void> {
+  set onData(fn: EventFn) {
+    this.events.on("data", fn);
+  }
+
+  async write(message: string): Promise<void> {
     const connection = await Deno.connect({ hostname: this.hostname, port: this.port, transport: "tcp" });
-    await connection.write(new TextEncoder().encode(JSON.stringify(message)));
+    await connection.write(new TextEncoder().encode(message));
     const buffer = new Uint8Array(1024);
     await connection.read(buffer);
     const response = new TextDecoder().decode(buffer);
-    this.socketEvents.emit("data", response);
+    this.events.emit("data", response);
+    connection.close();
   }
 }
 

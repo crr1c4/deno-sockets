@@ -14,7 +14,7 @@ for await (const connection of server) {
   const data = decoder.decode(buf);
   console.log(`Received: ${data}\n`);
 
-  connection.write(new TextEncoder().encode("Response from server"));
+  connection.write(new TextEncoder().encode(JSON.stringify({"response": "Response from server"})));
 }
 
 export {};
